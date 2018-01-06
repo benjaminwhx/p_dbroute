@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:sharding="http://shardingjdbc.io/schema/shardingjdbc/sharding"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://shardingjdbc.io/schema/shardingjdbc/sharding
+                        http://shardingjdbc.io/schema/shardingjdbc/sharding/sharding.xsd">
+
+    <context:property-placeholder location="classpath:conf/conf.properties" ignore-unresolvable="true" />
+
+    <bean id="ds_0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db0.driver}" />
+        <property name="url" value="${db0.url}" />
+        <property name="username" value="${db0.username}" />
+        <property name="password" value="${db0.password}" />
+    </bean>
+    <bean id="ds_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db1.driver}" />
+        <property name="url" value="${db1.url}" />
+        <property name="username" value="${db1.username}" />
+        <property name="password" value="${db1.password}" />
+    </bean>
+
+    <!-- 数据库选择策略 -->
+    <sharding:inline-strategy id="databaseStrategy" sharding-column="user_id" algorithm-expression="ds_${user_id % 2}" />
+    <sharding:inline-strategy id="orderTableStrategy" sharding-column="order_id" algorithm-expression="t_order_${order_id % 2}" />
+    <sharding:inline-strategy id="orderItemTableStrategy" sharding-column="order_id" algorithm-expression="t_order_item_${order_id % 2}" />
+    <!-- 其他策略 -->
+    <!--<sharding:standard-strategy id="standardStrategy" sharding-column="" precise-algorithm-class="" />-->
+    <!--<sharding:complex-strategy id="complexStrategy" sharding-columns="" algorithm-class="" />-->
+    <!--<sharding:hint-strategy id="hintStrategy" algorithm-class="" />-->
+    <!--<sharding:none-strategy id="noneStrategy" />-->
+
+    <!-- 数据源路由 -->
+    <sharding:data-source id="shardingDataSource">
+        <sharding:sharding-rule data-source-names="ds_0,ds_1">
+            <sharding:table-rules>
+                <sharding:table-rule logic-table="t_order" actual-data-nodes="ds_${0..1}.t_order_${0..1}" database-strategy-ref="databaseStrategy" table-strategy-ref="orderTableStrategy" />
+                <sharding:table-rule logic-table="t_order_item" actual-data-nodes="ds_${0..1}.t_order_item_${0..1}" database-strategy-ref="databaseStrategy" table-strategy-ref="orderItemTableStrategy" />
+            </sharding:table-rules>
+        </sharding:sharding-rule>
+        <sharding:props>
+            <prop key="sql.show">true</prop>
+            <prop key="executor.size">8</prop>
+        </sharding:props>
+    </sharding:data-source>
+</beans>
