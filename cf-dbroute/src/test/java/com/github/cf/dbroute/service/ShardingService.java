@@ -3,8 +3,11 @@ package com.github.cf.dbroute.service;
 import com.github.cf.dbroute.DoRoute;
 import com.github.cf.dbroute.bean.Loan;
 import com.github.cf.dbroute.bean.Order;
+import com.github.cf.dbroute.bean.OrderItem;
 import com.github.cf.dbroute.dao.LoanMapper;
+import com.github.cf.dbroute.dao.OrderItemMapper;
 import com.github.cf.dbroute.dao.OrderMapper;
+import com.github.cf.dbroute.router.RouteType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class ShardingService {
     private OrderMapper orderMapper;
     @Autowired
     private LoanMapper loanMapper;
+    @Autowired
+    private OrderItemMapper orderItemMapper;
     @Autowired
     private TransactionTemplate transactionTemplate;
 
@@ -70,5 +75,13 @@ public class ShardingService {
         loanMapper.insert(loan);
         List<Loan> newLoan = loanMapper.selectByUserId(loan.getUserId());
         LOGGER.info("selectLoan finish, new loan:{}", newLoan);
+    }
+
+    @Transactional
+    @DoRoute(routeType = RouteType.TABLE)
+    public void insertOrderItem(OrderItem orderItem) {
+        orderItemMapper.insert(orderItem);
+        List<OrderItem> newOrderItem = orderItemMapper.selectByUserId(orderItem.getUserId());
+        LOGGER.info("selectOrderItem finish, new OrderItem:{}", newOrderItem);
     }
 }

@@ -2,6 +2,7 @@ package com.github.cf.dbroute;
 
 import com.github.cf.dbroute.bean.Loan;
 import com.github.cf.dbroute.bean.Order;
+import com.github.cf.dbroute.bean.OrderItem;
 import com.github.cf.dbroute.service.ShardingService;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,19 @@ public class RouteTest {
     @Test
     public void testHaveTransactionNoSharding() {
         shardingService.insertAndSelectLoanWithTransaction(buildLoan());
+    }
+
+    @Test
+    public void testOrderItem() {
+        shardingService.insertOrderItem(buildOrderItem());
+    }
+
+    private static OrderItem buildOrderItem() {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setUserId(123);
+        orderItem.setItemId(1);
+        orderItem.setOrderId(555);
+        return orderItem;
     }
 
     private static Order buildOrder() {
