@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.cf.dbroute.dao.LoanMapper">
+
+    <resultMap id="BaseResultMap" type="com.github.cf.dbroute.bean.Loan">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="loan_id" property="loanId" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="amount" property="amount" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.github.cf.dbroute.bean.Loan">
+        insert into ocf_loan (id, loan_id, user_id, amount)
+        values(#{id, jdbcType=BIGINT}, #{loanId, jdbcType=VARCHAR}, #{userId, jdbcType=VARCHAR}, #{amount, jdbcType=DECIMAL})
+    </insert>
+
+    <select id="selectByUserId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * FROM
+        ocf_loan
+        where user_id = #{userId, jdbcType=VARCHAR}
+    </select>
+</mapper>

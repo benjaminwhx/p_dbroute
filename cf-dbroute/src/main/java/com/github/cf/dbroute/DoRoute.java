@@ -1,10 +1,17 @@
-package com.github.cf;
+package com.github.cf.dbroute;
+
+import com.github.cf.dbroute.router.RouteType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * User: benjamin.wuhaixu
+ * Date: 2018-01-08
+ * Time: 7:48 pm
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface DoRoute {
@@ -22,7 +29,8 @@ public @interface DoRoute {
      * 可以写成 #{[0].platPin},代表,从第一个参数loan对象中获取platPin属性.
      * </pre>
      */
-    String routeField() default "";
+    String shardingField() default "";
 
-    String routerTarget() default "";
+    RouteType routeType() default RouteType.DB_AND_TABLE;
 }
+

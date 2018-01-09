@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	 http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dynamicDataSource"/>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath:mapping/*.xml</value>
+            </array>
+        </property>
+        <property name="typeAliasesPackage" value="com.jd.jr.cf.bizaccount.domain"/>
+        <property name="plugins">
+            <array>
+                <bean class="com.github.cf.dbroute.MybatisShardingInterceptor">
+                    <property name="shardingConfig" ref="shardingConfig" />
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="commonMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.github.cf.dbroute.dao"/>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dynamicDataSource"/>
+    </bean>
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" order="10000"/>
+
+    <!-- 检测aop是否切中，是否有事务 -->
+    <bean class="com.github.cf.dbroute.utils.TransAop"/>
+</beans>

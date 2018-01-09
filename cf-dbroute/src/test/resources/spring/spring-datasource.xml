@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:conf/db.properties" />
+    
+    <bean id="basicDataSource" class="org.apache.commons.dbcp2.BasicDataSource" abstract="false">
+        <property name="driverClassName" value="${db.comm.driver}"/>
+        <property name="maxIdle" value="${db.comm.maxIdle}"/>
+        <property name="minIdle" value="${db.comm.minIdle}"/>
+        <property name="initialSize" value="${db.comm.initialSize}"/>
+        <property name="timeBetweenEvictionRunsMillis"
+                  value="${db.comm.timeBetweenEvictionRunsMillis}"/>
+        <property name="poolPreparedStatements" value="${db.comm.poolPreparedStatements}"/>
+        <property name="maxOpenPreparedStatements" value="${db.comm.maxOpenPreparedStatements}"/>
+        <property name="removeAbandonedTimeout" value="${db.comm.removeAbandonedTimeout}"/>
+        <!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+        <property name="testOnBorrow" value="${db.comm.testOnBorrow}"/>
+        <!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  -->
+        <property name="testOnReturn" value="${db.comm.testOnReturn}"/>
+        <!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于
+             timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。  -->
+        <property name="testWhileIdle" value="${db.comm.testWhileIdle}"/>
+        <!-- 用来检测连接是否有效的sql，要求是一个查询语句,如果validationQuery为
+             null，testOnBorrow、testOnReturn、testWhileIdle都不起其作用。 -->
+        <property name="validationQuery" value="${db.comm.validationQuery}"/>
+    </bean>
+
+    <bean id="dataSourceCommon" parent="basicDataSource">
+        <property name="url" value="${base.url}"/>
+        <property name="username" value="${base.user}"/>
+        <property name="password" value="${base.pwd}"/>
+    </bean>
+    <bean id="dataSource1" parent="basicDataSource">
+        <property name="url" value="${db1.url}"/>
+        <property name="username" value="${db1.user}"/>
+        <property name="password" value="${db1.pwd}"/>
+    </bean>
+    <bean id="dataSource2" parent="basicDataSource">
+        <property name="url" value="${db2.url}"/>
+        <property name="username" value="${db2.user}"/>
+        <property name="password" value="${db2.pwd}"/>
+    </bean>
+</beans>

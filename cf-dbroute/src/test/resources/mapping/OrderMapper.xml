@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.cf.dbroute.dao.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.github.cf.dbroute.bean.Order">
+        <id column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.github.cf.dbroute.bean.Order">
+        insert into t_order (order_id, user_id)
+        values(#{orderId, jdbcType=INTEGER}, #{userId, jdbcType=INTEGER})
+    </insert>
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select * FROM
+        t_order
+        where user_id = #{userId}
+    </select>
+</mapper>

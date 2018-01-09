@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <!-- 动态数据源 -->
+    <bean id="dynamicDataSource" class="com.github.cf.dbroute.ShardingDataSource">
+        <property name="targetDataSources">
+            <map>
+                <entry key="singleDataSource" value-ref="dataSourceCommon"/>
+                <entry key="db1" value-ref="dataSource1"/>
+                <entry key="db2" value-ref="dataSource2"/>
+            </map>
+        </property>
+        <property name="lenientFallback" value="false" />
+    </bean>
+
+    <!-- 拦截器，拦截@DoRoute -->
+    <bean id="doRouteInteceptor" class="com.github.cf.dbroute.DoRouteInterceptor">
+        <property name="ruleConfig" ref="ruleConfig" />
+        <property name="router" ref="router" />
+        <property name="order" value="50" />
+    </bean>
+
+    <!-- 路由器，这里使用系统默认路由器 -->
+    <bean id="router" class="com.github.cf.dbroute.router.DefaultRouter">
+        <constructor-arg name="ruleConfig" ref="ruleConfig" />
+        <constructor-arg name="shardingConfig" ref="shardingConfig" />
+    </bean>
+
+    <!-- 规则配置 -->
+    <bean id="ruleConfig" class="com.github.cf.dbroute.config.RuleConfig">
+        <property name="defaultShardingFieldName">
+            <set>
+                <value>userId</value>
+            </set>
+        </property>
+        <property name="ruleType" value="2" />
+        <property name="seqForTableIndex" value="true" />
+        <property name="tableIndexStyle" value="_0" />
+        <property name="tableStartSuffixIndex" value="0" />
+        <property name="dbKeyList">
+            <list>
+                <value>db1</value>
+                <value>db2</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 分片配置-->
+    <bean id="shardingConfig" class="com.github.cf.dbroute.config.ShardingConfig">
+        <property name="shardingTables">
+            <set>
+                <value>t_order</value>
+                <value>t_order_item</value>
+            </set>
+        </property>
+    </bean>
+</beans>
